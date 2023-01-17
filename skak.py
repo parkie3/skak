@@ -14,7 +14,7 @@ def is_over(thing, pos):
     return True if thing.collidepoint(pos) else False
 
 def is_over_circle(circle, pos):
-    return True if circle.radius > distance(pos, circle.pos) else False
+    return True if s/20 > distance(pos, circle.pos) else False
 
 def grid_snap(pos):
     x = Size*round((pos[0]+Size/2)/Size)-Size/2
