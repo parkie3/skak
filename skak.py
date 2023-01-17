@@ -1,4 +1,3 @@
-# skak spil der er bedre end patricks
 import pygame as pg
 from math import sqrt
 s = 400
@@ -45,7 +44,7 @@ class Piece:
     def __init__(self,pos,col,type,relpos):
         self.pos = pos
         self.size = Size
-        self.radius = Size
+        self.radius = s/20
         self.col = col
         self.type = type
         self.rect = pg.Rect(pos[0], pos[1], Size, Size)
@@ -157,12 +156,13 @@ while running:
         piece.drawp()
     pt = ""
     #mouse over tiles
-    for tile in tiles:
-        if is_over(tile.rect, Mouse):
-            for piece in pieces:
-                if tile.pos == piece.relpos:
-                    pt = piece.type
-            text = str(pt) + tile.name
+    for piece in pieces:
+        if is_over_circle(piece, Mouse):
+            pt = piece.type
+            for tile in tiles:
+                if is_over(tile.rect, Mouse):
+                    tn = tile.name
+            text = str(pt) + tn
             print(text)
             img = font.render(text, True, (255, 50, 50))
             screen.blit(img, (Mouse[0]+15,Mouse[1]+10))
