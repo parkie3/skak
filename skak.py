@@ -20,6 +20,22 @@ def grid_snap(pos):
     y = Size*round((pos[1]+Size/2)/Size)-Size/2
     return x, y
 
+
+def fenify(pieces):
+    fenkey = ''
+    piececheck = 0
+    found = False
+    for a in range(8):
+        for j in range(8):
+            for piece in pieces:
+                if (piece.pos[0]-Size/2, piece.pos[1]-Size/2) == (j,a):
+                    fenkey.append(piece.type)
+                    found = True
+
+                piececheck += 1
+
+    return fenkey
+
 # mouse class
 class Mouse:
 
@@ -88,7 +104,6 @@ colors = [(196, 164, 132), (64, 47, 29)]
 
 alf = ["a", "b", "c", "d", "e", "f", "g", "h"]
 tiles = []
-
 for i in range(8):
     for j in range(8):
         col = colors[(j+i)%2]
@@ -96,7 +111,7 @@ for i in range(8):
         tiles.append(Tile((i*Size, j*Size), Size, col, n))
 
 pieces = []
-piecesdata = "RNBQKBNRPPPPPPPP                                PPPPPPPPRNBQKBNR"
+piecesdata = "rnbqkbnrpppppppp                                PPPPPPPPRNBQKBNR"
 count = 0
 for i in range(8):
     for j in range(8):
@@ -111,7 +126,7 @@ for i in range(8):
         else:
             pieces.append(Piece((j*Size+Size/2,i*Size+Size/2),col, type_,(j*Size, i*Size)))
 
-print(pieces[0].pos and tiles[0].pos)
+print(pieces[0].pos, tiles[0].pos)
 mouse = Mouse((0, 0), False, False, None)
 
 running = True
@@ -163,7 +178,6 @@ while running:
                 if is_over(tile.rect, Mouse):
                     tn = tile.name
             text = str(pt) + tn
-            print(text)
             img = font.render(text, True, (255, 50, 50))
             screen.blit(img, (Mouse[0]+15,Mouse[1]+10))
 
