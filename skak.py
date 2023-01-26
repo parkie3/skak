@@ -1,9 +1,16 @@
 import pygame as pg
 from math import sqrt
+from stockfish import Stockfish
 s = 400
 screen = pg.display.set_mode((s, s))
 offset = s/64
 Size = s/8
+
+#https://github.com/zhelyabuzhsky/stockfish/blob/master/stockfish/models.py
+stockfish = Stockfish(r'C:\Users\patri\Downloads\stockfish_15.1_win_x64_avx2.exe')
+stockfish.set_depth(20)#How deep the AI looks
+stockfish.set_skill_level(20)#Highest rank stockfish
+stockfish.get_parameters()
 
 def distance(p1, p2):
     return sqrt((p2[0]-p1[0])**2 + (p2[1]-p1[1])**2)
@@ -21,32 +28,58 @@ def grid_snap(pos):
     return x, y
 
 
-def fenify(pieces, tiles):
+def fenify(pieces, tiles, move):
     fenkey = ''
     found = False
     for a in range(8):
+
         spacecount = 0
         for j in range(8):
+
             for tile in tiles:
+
                 if (tile.pos[0]/Size, tile.pos[1]/Size) == (j,a) and tile.occ == False:
                     found = True
+
                     if spacecount>0:
                         spacecount += 1
                         fenkey = fenkey[:-1]
                         fenkey += str(spacecount)
                         break
+
                     elif spacecount == 0:
                         spacecount +=1
                         fenkey += str(spacecount)
                         break
+
             if found == False:
                 spacecount = 0
                 for piece in pieces:
                     if (piece.relpos[0]/Size, piece.relpos[1]/Size) == (j,a):
                         fenkey +=piece.type
+
             found = False
+
         if a<7:
             fenkey+="/"
+    fsplit = fenkey.split("/")
+    print(fsplit)
+    fenkey += " "+turn+" "
+    dash = True
+    if "K2R" in fsplit[7] and "K4" not in move and "R7" not in move:
+        fenkey += "K"
+        dash = False
+    if "R3K" in fsplit[7] and "K4" not in move and "R0" not in move:
+        fenkey += "Q"
+        dash = False
+    if "r3k" in fsplit[0] and "k4" not in move and "r0" not in move:
+        fenkey += "k"
+        dash = False
+    if "k2r" in fsplit[0] and "k4" not in move and "r7" not in move:
+        fenkey += "q"
+        dash = False
+    if dash == True:
+        fenkey += "- "
     return fenkey
 
 # mouse class
@@ -72,6 +105,7 @@ class Piece:
 
     def __init__(self,pos,col,type,relpos):
         self.pos = pos
+        self.moved = False
         self.size = Size
         self.radius = s/20
         self.col = col
@@ -143,13 +177,19 @@ for i in range(8):
 
 print(pieces[0].pos, tiles[0].pos)
 mouse = Mouse((0, 0), False, False, None)
-
+turn = "w"
+move = []
 running = True
 pg.font.init()
 #run window
+
 while running:
     Mouse = pg.mouse.get_pos()
     font = pg.font.SysFont(None, 24)
+    castlies = ["R","r","k","K"]
+    for piece in pieces:
+        if piece.type in castlies and piece.moved == True:
+            move.append(piece.type+str(int(piece.relpos[0]/Size)))
 
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -158,7 +198,7 @@ while running:
             if event.key == pg.K_ESCAPE:
                 running = False
             elif event.key == pg.K_f:
-                print(fenify(pieces, tiles))
+                print(fenify(pieces, tiles, move))
         if event.type == pg.MOUSEBUTTONDOWN:
             if event.button == 1:
                 mouse.l_click = True
@@ -184,6 +224,11 @@ while running:
     if mouse.l_click:
         for piece in pieces:
             if is_over_circle(piece, mouse.pos):
+                if piece.col == (0,0,0):
+                    turn = "w"
+                else:
+                    turn = "b"
+                piece.moved = True
                 if mouse.holding != piece:
                     mouse.holding = piece
     # draw tiles
