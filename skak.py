@@ -21,18 +21,32 @@ def grid_snap(pos):
     return x, y
 
 
-def fenify(pieces):
+def fenify(pieces, tiles):
     fenkey = ''
-    piececheck = 0
     found = False
     for a in range(8):
+        spacecount = 0
         for j in range(8):
-            for piece in pieces:
-                if (piece.pos[0]-Size/2, piece.pos[1]-Size/2) == (j,a):
-                    fenkey.append(piece.type)
+            for tile in tiles:
+                if (tile.pos[0]/Size, tile.pos[1]/Size) == (j,a) and tile.occ == False:
                     found = True
-
-                piececheck += 1
+                    if spacecount>0:
+                        spacecount += 1
+                        tempkey = []
+                        for let in range(len(fenkey)-2):
+                            tempkey.append(let)
+                        fenkey = str(tempkey)
+                        fenkey += str(spacecount)
+                        break
+                    else:
+                        spacecount +=1
+                        fenkey += str(spacecount)
+            if found == False:
+                for piece in pieces:
+                    if (piece.relpos[0]/Size, piece.relpos[1]/Size) == (j,a):
+                        fenkey +=piece.type
+        found = False
+        fenkey+="/"
 
     return fenkey
 
@@ -85,12 +99,14 @@ class Piece:
         if not self.selected:
             self.pos = grid_snap(self.pos)
             self.OGpos = self.pos
+            self.relpos = (self.pos[0]-Size/2,self.pos[1]-Size/2)
 
 
 class Tile:
 
-    def __init__(self, pos, size, color, name):
+    def __init__(self, pos, size, color, name, occ):
         self.pos = pos
+        self.occ = occ
         self.size = size
         self.color = color
         self.name = name
@@ -108,7 +124,7 @@ for i in range(8):
     for j in range(8):
         col = colors[(j+i)%2]
         n = f"{alf[i]}{8-j}"
-        tiles.append(Tile((i*Size, j*Size), Size, col, n))
+        tiles.append(Tile((i*Size, j*Size), Size, col, n, False))
 
 pieces = []
 piecesdata = "rnbqkbnrpppppppp                                PPPPPPPPRNBQKBNR"
@@ -133,7 +149,6 @@ running = True
 pg.font.init()
 #run window
 while running:
-
     Mouse = pg.mouse.get_pos()
     font = pg.font.SysFont(None, 24)
 
@@ -143,6 +158,8 @@ while running:
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
                 running = False
+            elif event.key == pg.K_f:
+                print(fenify(pieces, tiles))
         if event.type == pg.MOUSEBUTTONDOWN:
             if event.button == 1:
                 mouse.l_click = True
@@ -156,6 +173,10 @@ while running:
 
     mouse.pos = pg.mouse.get_pos()
     mouse.update()
+    for tile in tiles:
+        for piece in pieces:
+            if piece.relpos == tile.pos:
+                tile.occ = True
     for piece in pieces:
         piece.update()
     if mouse.l_click:
