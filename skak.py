@@ -32,22 +32,21 @@ def fenify(pieces, tiles):
                     found = True
                     if spacecount>0:
                         spacecount += 1
-                        tempkey = []
-                        for let in range(len(fenkey)-2):
-                            tempkey.append(let)
-                        fenkey = str(tempkey)
+                        fenkey = fenkey[:-1]
                         fenkey += str(spacecount)
                         break
-                    else:
+                    elif spacecount == 0:
                         spacecount +=1
                         fenkey += str(spacecount)
+                        break
             if found == False:
+                spacecount = 0
                 for piece in pieces:
                     if (piece.relpos[0]/Size, piece.relpos[1]/Size) == (j,a):
                         fenkey +=piece.type
-        found = False
-        fenkey+="/"
-
+            found = False
+        if a<7:
+            fenkey+="/"
     return fenkey
 
 # mouse class
@@ -177,6 +176,9 @@ while running:
         for piece in pieces:
             if piece.relpos == tile.pos:
                 tile.occ = True
+                break
+            else:
+                tile.occ = False
     for piece in pieces:
         piece.update()
     if mouse.l_click:
