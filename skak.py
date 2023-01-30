@@ -5,11 +5,11 @@ s = 400
 screen = pg.display.set_mode((s, s))
 offset = s/64
 Size = s/8
-
+#C:\Users\patri\Downloads\stockfish_15.1_win_x64_bmi2\stockfish_15.1_win_x64_bmi2.exe
 #https://github.com/zhelyabuzhsky/stockfish/blob/master/stockfish/models.py
-stockfish = Stockfish(r'C:\Users\patri\Downloads\stockfish_15.1_win_x64_avx2.exe')
+stockfish = Stockfish(r'stockfish_15.1_win_x64_bmi2/stockfish_15.1_x64_bmi2.exe')
 stockfish.set_depth(20)#How deep the AI looks
-stockfish.set_skill_level(20)#Highest rank stockfish
+stockfish.set_skill_level(10)#Highest rank stockfish
 stockfish.get_parameters()
 
 def distance(p1, p2):
@@ -28,7 +28,7 @@ def grid_snap(pos):
     return x, y
 
 
-def fenify(pieces, tiles, move):
+def fenify(piece, tiles, move):
     fenkey = ''
     found = False
     for a in range(8):
@@ -73,13 +73,16 @@ def fenify(pieces, tiles, move):
         fenkey += "Q"
         dash = False
     if "r3k" in fsplit[0] and "k4" not in move and "r0" not in move:
-        fenkey += "k"
+        fenkey += "q"
         dash = False
     if "k2r" in fsplit[0] and "k4" not in move and "r7" not in move:
-        fenkey += "q"
+        fenkey += "k"
         dash = False
     if dash == True:
         fenkey += "- "
+    fenkey += " - "
+
+
     return fenkey
 
 # mouse class
@@ -107,11 +110,18 @@ class Piece:
         self.pos = pos
         self.moved = False
         self.size = Size
-        self.radius = s/20
         self.col = col
         self.type = type
-        self.rect = pg.Rect(pos[0], pos[1], Size, Size)
         self.relpos = relpos
+        if self.col == (0,0,0) and self.type == "p":
+            self.startfile = 1
+        elif self.col == (255,255,255) and self.type == "P":
+            self.startfile = 6
+        else:
+            self.startfile = False
+        self.lastfile = relpos[1]/Size
+        self.radius = s/20
+        self.rect = pg.Rect(pos[0], pos[1], Size, Size)
         self.selected = False
 
 
@@ -179,6 +189,7 @@ print(pieces[0].pos, tiles[0].pos)
 mouse = Mouse((0, 0), False, False, None)
 turn = "w"
 move = []
+lpt = ""
 running = True
 pg.font.init()
 #run window
@@ -231,6 +242,10 @@ while running:
                 piece.moved = True
                 if mouse.holding != piece:
                     mouse.holding = piece
+                    lpt = piece.type
+    for piece in pieces:
+        if piece.lastfile == piece.startfile+2 and piece.type == "p":
+            piece.eps == True
     # draw tiles
     for tile in tiles:
         tile.draw()
