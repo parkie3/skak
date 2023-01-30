@@ -66,16 +66,16 @@ def fenify(piece, tiles, move):
     print(fsplit)
     fenkey += " "+turn+" "
     dash = True
-    if "K2R" in fsplit[7] and "K4" not in move and "R7" not in move:
+    if "K4" not in move and "R7" not in move:
         fenkey += "K"
         dash = False
-    if "R3K" in fsplit[7] and "K4" not in move and "R0" not in move:
+    if "K4" not in move and "R0" not in move:
         fenkey += "Q"
         dash = False
-    if "r3k" in fsplit[0] and "k4" not in move and "r0" not in move:
+    if "k4" not in move and "r0" not in move:
         fenkey += "q"
         dash = False
-    if "k2r" in fsplit[0] and "k4" not in move and "r7" not in move:
+    if "k4" not in move and "r7" not in move:
         fenkey += "k"
         dash = False
     if dash == True:
