@@ -5,7 +5,6 @@ s = 400
 screen = pg.display.set_mode((s, s))
 offset = s/64
 Size = s/8
-#C:\Users\patri\Downloads\stockfish_15.1_win_x64_bmi2\stockfish_15.1_win_x64_bmi2.exe
 #https://github.com/zhelyabuzhsky/stockfish/blob/master/stockfish/models.py
 stockfish = Stockfish(r'stockfish_15.1_win_x64_bmi2/stockfish_15.1_x64_bmi2.exe')
 stockfish.set_depth(20)#How deep the AI looks
